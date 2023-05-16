@@ -66,7 +66,7 @@ echo -e "$START_URL\n$(wget -q -O - "$START_URL" | grep "start=.*onclick=" | sed
         #add new column to the item's row
         new_col "$ITEM_PRICE" "$CSV_FIND"
         #calculate price diff 
-        PRICE_DIFF=$(echo "scale=3; ($ITEM_PRICE-$CSV_ITEM_LAST_PRICE)/$CSV_ITEM_LAST_PRICE*100" | bc -l)
+        PRICE_DIFF=$(awk -v x="$ITEM_PRICE" -v y="$CSV_ITEM_LAST_PRICE" 'BEGIN {printf "%.2f", (x-y)/y*100 }')
 
         #add changed data to the mail content
         echo "Termék: $ITEM_NAME; Árváltozás mértéke: $PRICE_DIFF%; Új ár: $ITEM_PRICE; Link: $ITEM_URL" >> $MAIL_CONTENT
