@@ -5,9 +5,9 @@
 
 #declare variables
 EMAIL=""
-CSV="/tmp/arukereso.csv"
-MAIL_CONTENT="/tmp/arukereso.mail"
-TMP_CSV="/tmp/arukereso.csv.tmp"
+CSV="arukereso.csv"
+MAIL_CONTENT="arukereso.mail"
+TMP_CSV="arukereso.csv.tmp"
 
 DATE=$(date "+%Y-%m-%d")
 
@@ -33,10 +33,18 @@ if [ ! -f "$CSV" ]; then
 fi
 
 #arukereso url
-START_URL="https://www.arukereso.hu/mikrohullamu-suto-c3179/f:beepitheto,urtartalom=4;5/"
+START_URL="https://www.arukereso.hu/mikrohullamu-suto-c3179/"
+NUM=$(wget -q -O - "$START_URL" | grep "class=.product-num hidden" | sed -e "s~.*<span>\(.*\) termék.*~\1~")
+
 
 #get all item pages
-echo -e "$START_URL\n$(wget -q -O - "$START_URL" | grep "start=.*onclick=" | sed -e "s~.*href=\"\(.*\)\" onclick.*~\1~" | sort | uniq)" | while read URL; do
+seq 0 25 $NUM | while read START; do
+  if [ $START -gt 0 ]; then
+    URL="$START_URL?start=$START";
+  else 
+    URL=$START_URL
+  fi
+
   #get all items
   wget -q -O - "$URL" | grep "<a.*class=\"price\"" | grep -v "productads.hu" | while read LINE; do
     #multi shop
